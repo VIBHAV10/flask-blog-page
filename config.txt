@@ -1,0 +1,18 @@
+{
+    "parameters":
+    {
+        "local_server":"True", //  *if we are using a local server, set this as true*
+        
+        "local_uri":"mysql://root:@localhost/codingthunder", *uri for msql, uri for different sqlite, oracle, etc. Can be seen in the documentation for SqlAlchemy*
+        
+        "production_uri":"mysql://root:@localhost/codingthunder"
+    },
+    
+
+    "anchors":
+    {
+        "facebook_link":"www.facebook.com", *add links to your profiles*
+        "twitter_link":"www.twitter.com",
+        "github_link":"www.github.com"
+    }
+}

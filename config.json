@@ -1,0 +1,44 @@
+{
+    "parameters":
+    {
+        "local_server":"True", 
+        
+        "local_uri":"mysql://root:@localhost/sampleflaskblog", 
+        
+        "production_uri":"mysql://root:@localhost/",
+
+        "blog_name":"Flask V Blog",
+
+        "tagline":"A Sample Blog",
+
+        "gmail-user":"emailservicefordev@gmail.com",
+
+        "gmail-password":"12152024bd",
+
+        "gmail-recipient":"emailservicefordev@gmail.com",
+
+        "number_of_posts": 4,
+
+        "login_image":"login.svg",
+
+        "admin_user":"vibhav",
+
+        "admin_password": "vibhav"
+
+        
+    },
+
+    "anchors":
+    {
+        "facebook":"https://www.facebook.com",
+
+        "twitter":"https://www.twitter.com",
+
+        "github":"https://www.github.com"
+    },
+
+    "websitecreds":
+    {
+
+    }
+}
