@@ -2,10 +2,13 @@
 from flask import Flask, render_template, request, redirect
 from flask_sqlalchemy import SQLAlchemy
 from flask_mail import Mail
-import json
 from datetime import datetime
 from flask import session
 from flask import sessions
+import json
+import os
+import math
+from werkzeug.utils import secure_filename
 
 #reading config.json file 
 with open('config.json', 'r') as c:
@@ -20,6 +23,7 @@ with open('config.json', 'r') as e:
 #setting the smtp server configs of using flask_mail
 app = Flask(__name__)
 app.secret_key = 'super-secret-key'
+app.config['UPLOAD_FOLDER'] = parameters['upload_location']
 app.config.update(
     MAIL_SERVER = 'smtp.gmail.com',
     MAIL_PORT = '465',
@@ -69,7 +73,23 @@ class Posts(db.Model):
 #home-page
 @app.route("/")
 def home():
-    posts = Posts.query.filter_by().all()[0:parameters['number_of_posts']]
+    posts = Posts.query.filter_by().all()
+    last = math.ceil(len(posts)/int(parameters['number_of_posts']))
+    page = request.args.get('page')
+    if (not str(page).isnumeric()):
+        page = 1
+    page = int(page)
+    posts = posts[(page-1)*int(parameters['number_of_posts']):(page-1)*int(parameters['number_of_posts'])+ int(parameters['number_of_posts'])]
+    if page==1:
+        prev = "#"
+        next = "/?page="+ str(page+1)
+    elif page==last:
+        prev = "/?page="+ str(page-1)
+        next = "#"
+    else:
+        prev = "/?page="+ str(page-1)
+        next = "/?page="+ str(page+1)
+    
     #returning all the json variable lists with the template file
     return render_template('index.html', parameters=parameters,anchors=anchors,websitecreds=websitecreds, posts=posts)
 
@@ -134,56 +154,27 @@ def dashboard():
 
     return render_template('login.html',parameters=parameters)
 
-'''
 
-@app.route("/edit/<string:sno>" , methods = ['GET', 'POST'])
-def edit(sno):
-    if "user" in session and session['user'] == parameters['admin_user']:
-        if request.method=="POST":
-            box_title = request.form.get('title')
-            tline = request.form.get('tline')
-            slug = request.form.get('slug')
-            content = request.form.get('content')
-            img_file = request.form.get('img_file')
-            date = datetime.now()
 
-            if sno=='0':
-                post = Posts(title=box_title, slug=slug, content=content, tagline=tline, img_file=img_file, date=date)
-                db.session.add(post)
-                db.session.commit()
-            else:
-                post = Posts.query.filter_by(sno=sno).first()
-                post.title = box_title
-                post.slug = slug
-                post.content = content
-                post.tagline = tline
-                post.img_file = img_file
-                post.date = date
-                db.session.commit()
-                return redirect('/edit/'+sno)
-        post = Posts.query.filter_by(sno=sno).first()
-        return render_template('edit.html', parameters=parameters, post=post, sno=sno, anchors=anchors)
-
-'''
 @app.route("/edit/<string:sno>" , methods=['GET', 'POST'])
 def edit(sno):
     if "user" in session and session['user']==parameters['admin_user']:
         if request.method=="POST":
-            box_title = request.form.get('title')
-            tline = request.form.get('Tline')
+            title = request.form.get('title')
+            tagline = request.form.get('Tline')
             slug = request.form.get('slug')
             content = request.form.get('content')
             img_file = request.form.get('img_file')
             date = datetime.now()
         
             if sno=='0':
-                post = Posts(title=box_title, slug=slug, content=content, tagline=tline, img_file=img_file, date=date)
+                post = Posts(title=title, slug=slug, content=content, tagline=tagline, img_file=img_file, date=date)
                 db.session.add(post)
                 db.session.commit()
             else:
                 post = Posts.query.filter_by(sno=sno).first()
-                post.box_title = box_title
-                post.tline = tline
+                post.title = title
+                post.tagline = tagline
                 post.slug = slug
                 post.content = content
                 post.img_file = img_file
@@ -195,10 +186,27 @@ def edit(sno):
         return render_template('edit.html', parameters=parameters, post=post, anchors=anchors,sno=sno)
 
 
+@app.route("/uploader" , methods=['GET', 'POST'])
+def uploader():
+    if "user" in session and session['user']==parameters['admin_user']:
+        if request.method=='POST':
+            f = request.files['file1']
+            f.save(os.path.join(app.config['UPLOAD_FOLDER'], secure_filename(f.filename)))
+            return "Uploaded successfully!"
 
+@app.route('/logout')
+def logout():
+    session.pop('user')
+    return redirect('/dashboard')
 
+@app.route("/delete/<string:sno>" , methods=['GET', 'POST'])
+def delete(sno):
+    if "user" in session and session['user']==parameters['admin_user']:
+        post = Posts.query.filter_by(sno=sno).first()
+        db.session.delete(post)
+        db.session.commit()
+    return redirect("/dashboard")
 
 
 #for auto-reconfiguring everytime a change is made in the app.py file
 app.run(debug=True)
-

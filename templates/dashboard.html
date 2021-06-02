@@ -7,7 +7,8 @@
                     <div class="col-md-10 col-lg-8 col-xl-7">
                         <div class="site-heading">
                             <h1>ADMIN PANEL</h1>
-                            <span class="subheading">manage your posts and save them</span>
+                            
+                            
                         </div>
                     </div>
                 </div>
@@ -16,8 +17,15 @@
         <div class="container px-4 px-lg-5">
             <div class="row gx-4 gx-lg-5 justify-content-center">
                 <div class="col-md-10 col-lg-8 col-xl-7">
+                        <span class="subheading"><h1>Basic Actions </h1></span>
+                        <a href="edit/0"> <button class="btn btn-primary text-uppercase"> ADD A NEW POST </button> </a>
+                        <a href="/logout"> <button class="btn btn-primary text-uppercase"> LOGOUT </button> </a>
+                        <hr>
                         <h1> Upload A File </h1>
-                        <!-- Divider-->
+                        <form action="/uploader" method='post' enctype="multipart/form-data">
+                            <input type='file' name='file1'>
+                                <button type="submit"  class="btn btn-primary text-uppercase">SUBMIT</button>
+                        <hr>
                         <h1> Edit Posts </h1>
 
                         <hr class="my-4" />
@@ -40,7 +48,7 @@
                         <td>{{post.title}}</td>
                         <td>{{post.date}}</td>
                         <td><a href="/edit/{{post.sno}}" <button class="btn btn-primary text-uppercase">edit</button> </a> </td>
-                        <td><a href="/edit/{{post.sno}}" <button class="btn btn-primary text-uppercase">delete</button> </a> </td>
+                        <td><a href="/delete/{{post.sno}}" <button class="btn btn-primary text-uppercase">delete</button> </a> </td>
                     </tr>
                     {% endfor %}
                 </table>
